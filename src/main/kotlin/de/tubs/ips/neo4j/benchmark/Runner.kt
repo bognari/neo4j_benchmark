@@ -93,7 +93,8 @@ fun main(args: Array<String>) {
     
     for ((index, query) in queries.withIndex()) {
         print("normal, ")
-        print(index)
+        print("$index, ")
+        print("\"$query\"")
         run(driver, query)
         println()
         for (func in Func.values()) {
@@ -105,14 +106,15 @@ fun main(args: Array<String>) {
 fun simulation(driver: Driver, func: Func, query: String, index: Int) {
     for (mode in Mode.values()) {
         print("$func $mode, ")
-        print(index)
+        print("$index, ")
+        print("\"$query\"")
         run(driver, "CALL simulation.$func(\"$query\", \"$mode\")")
         println()
     }
 }
 
 fun header() {
-    print("func, index ")
+    print("func, index, query ")
     for (i in 1..runs) {
         print(", ra $i")
         print(", rc $i")
