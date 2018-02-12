@@ -9,10 +9,12 @@ enum class Mode {
     NORMAL, SHARED, PARALLEL
 }
 
-@SuppressWarnings ()
+@SuppressWarnings()
 enum class Func {
     dualID, dualLabel, strongID, strongLabel
 }
+
+val runs = 2
 
 val queries = listOf("""
     MATCH () RETURN count(*);
@@ -85,6 +87,9 @@ fun main(args: Array<String>) {
     }
 
     val driver = GraphDatabase.driver(args[0], AuthTokens.basic(args[1], args[2]))
+
+    header()
+    println()
     
     for ((index, query) in queries.withIndex()) {
         print("normal, ")
@@ -97,7 +102,7 @@ fun main(args: Array<String>) {
     }
 }
 
-fun simulation (driver: Driver, func: Func, query: String, index: Int) {
+fun simulation(driver: Driver, func: Func, query: String, index: Int) {
     for (mode in Mode.values()) {
         print("$func $mode, ")
         print(index)
@@ -106,12 +111,23 @@ fun simulation (driver: Driver, func: Func, query: String, index: Int) {
     }
 }
 
+fun header() {
+    print("func, index ")
+    for (i in 1..runs) {
+        print(", ra $i")
+        print(", rc $i")
+        print(", time $i")
+    }
+}
+
 fun run(driver: Driver, query: String) {
-    for (i in 0..1) {
+    for (i in 1..runs) {
         driver.session().use {
+            val time = System.currentTimeMillis()
             val summary = it.run(query).consume()
             print(", ${summary.resultAvailableAfter(TimeUnit.MILLISECONDS)}")
             print(", ${summary.resultConsumedAfter(TimeUnit.MILLISECONDS)}")
+            print(", ${System.currentTimeMillis() - time}")
         }
     }
 }
