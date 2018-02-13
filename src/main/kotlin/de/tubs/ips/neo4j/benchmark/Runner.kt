@@ -142,7 +142,7 @@ fun run(driver: Driver, func: Func, mode: Mode, query: String) {
             print(", $rc")
             print(", ${ra + rc}")
             print(", ${System.currentTimeMillis() - time}")
-            println(", $number")
+            print(", $number")
         }
     }
 }
