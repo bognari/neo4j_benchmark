@@ -19,21 +19,21 @@ val queries = listOf("""
     MATCH () RETURN count(*);
 """.trimIndent(),
         """MATCH
-  (x:FullProfessor)-[:worksFor]-({id: 'http://www.Department0.University99.edu'})
+  (x:FullProfessor)-[:worksFor]-({id: 'http://www.Department0.University0.edu'})
 OPTIONAL MATCH
   (y)-[:advisor]-(x),
   (x)-[:teacherOf]-(z),
   (y)-[:takesCourse]-(z)
 RETURN x, y, z;""",
         """MATCH
-  (x:FullProfessor)-[:worksFor]-({id: 'http://www.Department0.University12.edu'})
+  (x:FullProfessor)-[:worksFor]-({id: 'http://www.Department0.University0.edu'})
 OPTIONAL MATCH
   (y)-[:advisor]-(x),
   (x)-[:teacherOf]-(z),
   (y)-[:takesCourse]-(z)
 RETURN x, y, z;""",
         """MATCH
-  (x:FullProfessor)-[:worksFor]-({id: 'http://www.Department0.University12.edu'})
+  (x:FullProfessor)-[:worksFor]-({id: 'http://www.Department0.University0.edu'})
 RETURN x, x.emailAddress, x.telephone, x.name;""",
         """MATCH
   (st)-[:teachingAssistantOf]-(course)
