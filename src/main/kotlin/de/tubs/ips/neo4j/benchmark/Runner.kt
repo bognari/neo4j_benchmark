@@ -10,7 +10,7 @@ enum class Mode {
 }
 
 enum class Func {
-    dualID, dualLabel, strongID, strongLabel, normal
+    normal, dualID, dualLabel, strongID, strongLabel
 }
 
 val runs = 2
