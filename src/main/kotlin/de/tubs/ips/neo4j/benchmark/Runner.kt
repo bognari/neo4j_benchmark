@@ -9,9 +9,8 @@ enum class Mode {
     NORMAL, SHARED, PARALLEL
 }
 
-@SuppressWarnings()
 enum class Func {
-    dualID, dualLabel, strongID, strongLabel
+    dualID, dualLabel, strongID, strongLabel, normal
 }
 
 val runs = 2
@@ -90,46 +89,60 @@ fun main(args: Array<String>) {
 
     header()
     println()
-    
+
     for ((index, query) in queries.withIndex()) {
-        print("normal, ")
-        print("$index, ")
-        print("\"$query\"")
-        run(driver, query)
-        println()
         for (func in Func.values()) {
-            simulation(driver, func, query, index)
+            Mode.values()
+                    .asSequence()
+                    .filterNot { func == Func.normal && it != Mode.NORMAL }
+                    .forEach { simulation(driver, func, it, query, index) }
         }
     }
 }
 
-fun simulation(driver: Driver, func: Func, query: String, index: Int) {
-    for (mode in Mode.values()) {
-        print("$func $mode, ")
-        print("$index, ")
-        print("\"$query\"")
-        run(driver, "CALL simulation.$func(\"$query\", \"$mode\")")
-        println()
-    }
+fun simulation(driver: Driver, func: Func, mode: Mode, query: String, index: Int) {
+    print("$index, ")
+    print("$func, ")
+    print("$mode")
+
+    run(driver, func, mode, query)
+    println()
+
 }
 
 fun header() {
-    print("func, index, query ")
+    print("index, func, mode")
     for (i in 1..runs) {
         print(", ra $i")
         print(", rc $i")
+        print(", ra + rc $i")
         print(", time $i")
+        print(", number $i")
     }
 }
 
-fun run(driver: Driver, query: String) {
+fun run(driver: Driver, func: Func, mode: Mode, query: String) {
     for (i in 1..runs) {
         driver.session().use {
             val time = System.currentTimeMillis()
-            val summary = it.run(query).consume()
-            print(", ${summary.resultAvailableAfter(TimeUnit.MILLISECONDS)}")
-            print(", ${summary.resultConsumedAfter(TimeUnit.MILLISECONDS)}")
+
+            val result =
+                    if (func != Func.normal) {
+                        it.run("CALL simulation.$func(\"$query\", \"$mode\")")
+                    } else {
+                        it.run(query)
+                    }
+
+            val number = result.list().size
+            val sum = result.consume()
+            val ra = sum.resultAvailableAfter(TimeUnit.MILLISECONDS)
+            val rc = sum.resultConsumedAfter(TimeUnit.MILLISECONDS)
+
+            print(", $ra")
+            print(", $rc")
+            print(", ${ra + rc}")
             print(", ${System.currentTimeMillis() - time}")
+            println(", $number")
         }
     }
 }
